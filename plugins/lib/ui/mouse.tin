@@ -1,37 +1,81 @@
+#nop vim: set filetype=tt:;
+
+#var lib_ui_mouse[META] {
+    {NAME}      {鼠标支持}
+    {DESC}      {支持鼠标和触摸板操作，允许上下翻屏、点击按钮}
+    {AUTHOR}    {担子炮}
+};
+
 #config {mouse} on;
 
-#EVENT {SCROLLED CTRL MOUSE WHEEL DOWN} {
-    #if {%1 == 0 || %1 == 1} {
-        #cursor history next;
+load-lib ui/keyboard;
+
+#event {SCROLLED CTRL MOUSE WHEEL DOWN} {
+    #if {%2 * -1 <= $prompt-bot-max-line + 1 } {
+        #cursor {history next};
     };
     #else {
+        #local info {};
+        #buffer info save info;
+        #if { $info[LINE] < 0 || $info[LINE] >= $info[USED] } {
+            keyboard.NormalMode;
+            #return;
+        };
+        keyboard.LessMode;
         #buffer down 1;
     };
 };
 
-#EVENT {SCROLLED CTRL MOUSE WHEEL UP} {
-    #if {%1 == 0 || %1 == 1} {
-        #cursor history prev;
+#event {SCROLLED CTRL MOUSE WHEEL UP} {
+    #if {%2 * -1 <= $prompt-bot-max-line + 1 } {
+        #cursor {history prev};
     };
     #else {
+        #local info {};
+        #buffer info save info;
+        #if { $info[LINE] == 0 } {
+            #return;
+        };
+        keyboard.LessMode;
         #buffer up 1;
     };
 };
 
-#EVENT {SCROLLED MOUSE WHEEL DOWN} {
-    #if {%1 == 0 || %1 == 1} {
-        #cursor history next;
+#event {SCROLLED MOUSE WHEEL DOWN} {
+    #if {%2 * -1 <= $prompt-bot-max-line + 1 } {
+        #cursor {history next};
     };
     #else {
+        #local info {};
+        #buffer info save info;
+        #if { $info[LINE] < 0 || $info[LINE] >= $info[USED] } {
+            keyboard.NormalMode;
+            #return;
+        };
+        keyboard.LessMode;
         #buffer down 10;
     };
 };
 
-#EVENT {SCROLLED MOUSE WHEEL UP} {
-    #if {%1 == 0 || %1 == 1} {
-        #cursor history prev;
+#event {SCROLLED MOUSE WHEEL UP} {
+    #if {%2 * -1 <= $prompt-bot-max-line + 1 } {
+        #cursor {history prev};
     };
     #else {
+        #local info {};
+        #buffer info save info;
+        #if { $info[LINE] == 0 } {
+            #return;
+        };
+        keyboard.LessMode;
         #buffer up 10;
     };
+};
+
+#event {SHORT-CLICKED LINK SEND MOUSE BUTTON ONE} {
+    #send {%4};
+};
+
+#event {SHORT-CLICKED LINK EXEC MOUSE BUTTON ONE} {
+    %4;
 };
